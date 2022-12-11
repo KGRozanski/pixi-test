@@ -15,6 +15,14 @@ export class Chunk {
         this.app.stage.addChild(this.container);
     }
 
+    public static get width(): number {
+        return Tile.width * Constants.chunkSize;
+    }
+
+    public static get height(): number {
+        return (Tile.height / 2) * Constants.chunkSize;
+    }
+
     render(origin: Point) {
         this.container.removeChildren();
 
