@@ -3,42 +3,82 @@ import { keyFactory } from "../functions/keyFactory.function";
 import { getScreenCenter } from "../utils/getScreenCenter.function";
 import { Chunk } from "./Chunk";
 
+interface ChunkWithMetadata {
+    coords: { x: number, y: number},
+    chunk: Chunk
+}
+
 export class Map {
-    private chunk: Chunk;
+    public origin: Point = getScreenCenter();
+    public chunks: Array<Array<ChunkWithMetadata>> = [];
+    // Size of the rectangle minimum to cover the entire screen
+    // chunks x,y axis  must be at least bigger than the screen size
+    private _gridSize: number = 4;
     
 
     constructor(private app: Application, private graphics: Graphics) {
-        this.chunk = new Chunk(app, graphics, {});
-        this.chunk.render(getScreenCenter())
-
         console.log(
             Chunk.width,
             Chunk.height
-
         )
+            
+            this.listen();
 
-        const right = keyFactory("ArrowRight");
+
+            const HALF_GRID_SIZE = this._gridSize / 2;
+
+            for (let i = 0; i < this._gridSize; i++) {
+                this.chunks.push([]);
+
+                for (let j = 0; j < this._gridSize; j++) {
+                    const coords = {x: j - HALF_GRID_SIZE, y: i - HALF_GRID_SIZE };
+                    this.chunks[i].push({
+                        coords,
+                        chunk: new Chunk(this.app, this.graphics)
+                    });
+                }
+            }
+
+            console.log(this.chunks)
+    }
+
+    listen(): void {
         const top = keyFactory("ArrowUp");
+        const right = keyFactory("ArrowRight");
         const down = keyFactory("ArrowDown");
         const left = keyFactory("ArrowLeft");
-
-        let ticker = this.app.ticker.add((delta => {
-            if(right.isDown ) {
-                console.log(right.value)
-            }
+    
+        this.app.ticker.add((delta => {
             if(top.isDown ) {
-                console.log(top.value)
+                this.origin.y -= 1;
+            }
+            if(right.isDown ) {
+                this.origin.x += 1;
             }
             if(down.isDown ) {
-                console.log(down.value)
+                this.origin.y += 1;
             }
             if(left.isDown ) {
-                console.log(left.value)
+                this.origin.x -= 1;
             }
+
+            this.calculate();
+
         }));
+    }
 
+    calculate(): void {
+        this.chunks.flat().forEach((chunk) => {
+            
+            chunk.chunk.render(this.getChunkPos(chunk.coords));
+        });
+    }
 
-
+    getChunkPos(coords: {x: number, y: number}): Point {
+        return new Point(
+            (Chunk.width * coords.x) - (this.origin.x - getScreenCenter().y ),
+            (Chunk.height * coords.y) - (this.origin.y - getScreenCenter().x)
+        );
     }
 
 

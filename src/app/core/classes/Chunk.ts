@@ -4,13 +4,10 @@ import { Tile } from "./Tile";
 
 export class Chunk {
     private app: Application;
-    private graphics: Graphics;
     private container: Container;
-    private tile!: Tile;
 
-    constructor(app: Application, graphics: Graphics, data: any) {
+    constructor(app: Application, graphics: Graphics) {
         this.app = app;
-        this.graphics = graphics;
         this.container = new Container();
         this.app.stage.addChild(this.container);
     }
@@ -38,8 +35,9 @@ export class Chunk {
 
                 this.container.addChild(Tile.make("/assets/img/tiles/dirt.png", tilePos));
             }
-            
         }
 
     }
+
+
 }
