@@ -1,15 +1,17 @@
-import { Application, Container, Graphics, Point } from "pixi.js";
+import { Application, Container, FederatedPointerEvent, Graphics, Point } from "pixi.js";
 import { Constants } from "../constants/Constants.class";
 import { Tile } from "./Tile";
 
 export class Chunk {
-    private app: Application;
-    private container: Container;
+    private _container: Container;
 
-    constructor(app: Application, graphics: Graphics) {
-        this.app = app;
-        this.container = new Container();
-        this.app.stage.addChild(this.container);
+    constructor() {
+        this._container = new Container();
+        this._container.name = "chunk"
+    }
+
+    public get container(): Container {
+        return this._container;
     }
 
     public static get width(): number {
@@ -21,7 +23,7 @@ export class Chunk {
     }
 
     render(origin: Point) {
-        this.container.removeChildren();
+        this._container.removeChildren();
 
         for (let i = 0; i < Constants.chunkSize; i++) {
             for (let j = 0; j < Constants.chunkSize; j++) {
@@ -33,7 +35,7 @@ export class Chunk {
                     tilePos.x = origin.x + tilePos.x;
                     tilePos.y = origin.y + tilePos.y;
 
-                this.container.addChild(Tile.make("/assets/img/tiles/dirt.png", tilePos));
+                this._container.addChild(Tile.make("/assets/img/tiles/dirt.png", tilePos));
             }
         }
 

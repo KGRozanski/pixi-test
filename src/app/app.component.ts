@@ -17,7 +17,6 @@ export class AppComponent {
   private Application: any;
   
 
-  private graphics: any = new PIXI.Graphics();
   
   
   constructor(@Inject(DOCUMENT) private document: Document) {
@@ -26,12 +25,15 @@ export class AppComponent {
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
       antialias: true,
+      sharedTicker: true
     });
+
+    document.body.appendChild(this.Application.view);
+    const map = new Map(this.Application);
+    this.Application.stage.addChild(map.container)
   }
 
   async ngOnInit() {
-    document.body.appendChild(this.Application.view);
-    const map = new Map(this.Application, this.graphics);
 
 
 
