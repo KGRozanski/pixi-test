@@ -4,6 +4,7 @@ import { Tile } from "./Tile";
 
 export class Chunk {
     private _container: Container;
+    private _chunkCenterOffset = 8 * Tile.width;
 
     constructor() {
         this._container = new Container();
@@ -19,7 +20,7 @@ export class Chunk {
     }
 
     public static get height(): number {
-        return (Tile.height / 2) * Constants.chunkSize;
+        return Tile.height * Constants.chunkSize;
     }
 
     render(origin: Point) {
@@ -27,10 +28,6 @@ export class Chunk {
 
         for (let i = 0; i < Constants.chunkSize; i++) {
             for (let j = 0; j < Constants.chunkSize; j++) {
-                // let tilePos = new Point(
-                //     (i % 2 !== 0) ? j * Tile.width + Tile.width / 2 : j * Tile.width, 
-                //     (Tile.height / 2) * i
-                // );
 
                 let cartesian = new Point(
                     i * Tile.width,
@@ -38,11 +35,11 @@ export class Chunk {
                 )
 
                 let iso = new Point(
-                    (j * 1 * Tile.width) / 2 + (i * -1 * j),
-                    (j * .5 * Tile.height) + (i * 1 * Tile.height )
+                    (((j * Tile.width) / 2 * 1  + i * Tile.width * -.5) - Tile.width / 2) + this._chunkCenterOffset,
+                    j * Tile.height * .5 + i * Tile.height * .5
                 );
 
-                    console.log(iso)
+                    console.log(this._container.toLocal(iso))
 
 
                     // tilePos.x = origin.x + tilePos.x;

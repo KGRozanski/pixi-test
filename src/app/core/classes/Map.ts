@@ -121,8 +121,8 @@ export class Map {
       .drawRect(
         CHUNK_ORIGIN.x,
         CHUNK_ORIGIN.y,
-        Chunk.width + Tile.width / 2,
-        Chunk.height + Tile.height / 2
+        Chunk.width,
+        Chunk.height
       );
     this._container.addChild(graphics);
 
