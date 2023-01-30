@@ -48,29 +48,29 @@ export class Map {
     });
 
     
-    this._container.on('mousemove', (event: FederatedPointerEvent) => {
-      // console.log(event.target.parent)
-      const pointOfCursor: Point = this._container.toLocal(event.client);
-      const chunksInCol = Math.floor(pointOfCursor.x / Chunk.width);
-      const chunksInRow = Math.floor(pointOfCursor.y / Chunk.height);
+    // this._container.on('mousemove', (event: FederatedPointerEvent) => {
+    //   // console.log(event.target.parent)
+    //   const pointOfCursor: Point = this._container.toLocal(event.client);
+    //   const chunksInCol = Math.floor(pointOfCursor.x / Chunk.width);
+    //   const chunksInRow = Math.floor(pointOfCursor.y / Chunk.height);
 
-      const pointInChunk: Point = new Point(
-        Math.abs(chunksInCol * Chunk.width - pointOfCursor.x),
-        Math.abs(chunksInRow * Chunk.height - pointOfCursor.y)
-      );
+    //   const pointInChunk: Point = new Point(
+    //     Math.abs(chunksInCol * Chunk.width - pointOfCursor.x),
+    //     Math.abs(chunksInRow * Chunk.height - pointOfCursor.y)
+    //   );
 
-      const tileCol = Math.floor(pointInChunk.x / Tile.width)
-      const tileRow = Math.floor(pointInChunk.y / Tile.height)
+    //   const tileCol = Math.floor(pointInChunk.x / Tile.width)
+    //   const tileRow = Math.floor(pointInChunk.y / Tile.height)
 
-      const pointInTile: Point = new Point(
-        Math.abs(tileCol * Tile.width - pointInChunk.x),
-        Math.abs(tileRow * Tile.height - pointInChunk.y)
-      );
+    //   const pointInTile: Point = new Point(
+    //     Math.abs(tileCol * Tile.width - pointInChunk.x),
+    //     Math.abs(tileRow * Tile.height - pointInChunk.y)
+    //   );
 
-      //https://www.youtube.com/watch?v=04oQ2jOUjkU&ab_channel=JordanWest
+    //   //https://www.youtube.com/watch?v=04oQ2jOUjkU&ab_channel=JordanWest
 
       
-    })
+    // })
 
     this.listen();
   }
