@@ -9,7 +9,8 @@ export class Tile {
   }
 
   public static get height(): number {
-    return Math.floor(Tile.width / Math.tan((60 * Math.PI) / 180));
+    // return Math.floor(Tile.width / Math.tan((60 * Math.PI) / 180));
+    return Constants.tileSize;
   }
 
   public static make(texture: string, pos: Point) {
@@ -18,13 +19,13 @@ export class Tile {
     SPRITE.y = pos.y;
 
     SPRITE.interactive = true;
-    SPRITE.on('mouseover', (event: any) => {
-      Tile.renderHover(SPRITE);
-    });
+    // SPRITE.on('mouseover', (event: any) => {
+    //   Tile.renderHover(SPRITE);
+    // });
 
-    SPRITE.on('mouseout', (event: any) => {
-      SPRITE.parent.removeChild(SPRITE.parent.getChildByName('hover_outline'))
-    });
+    // SPRITE.on('mouseout', (event: any) => {
+    //   SPRITE.parent.removeChild(SPRITE.parent.getChildByName('hover_outline'))
+    // });
 
     return SPRITE;
   }

@@ -1,10 +1,11 @@
-import { Application, Container, FederatedPointerEvent, Graphics, Point } from "pixi.js";
+import { Application, Container, FederatedPointerEvent, Graphics, Point, Sprite } from "pixi.js";
 import { Constants } from "../constants/Constants.class";
 import { Tile } from "./Tile";
 
 export class Chunk {
     private _container: Container;
     private _chunkCenterOffset = 8 * Tile.width;
+    private _tiles: Array<Array<Sprite>> = [];
 
     constructor() {
         this._container = new Container();
@@ -16,10 +17,14 @@ export class Chunk {
             
             
 
-            const x = COORDS_IN_CHUNK.x + COORDS_IN_CHUNK.y;
-            const y = COORDS_IN_CHUNK.x * -1 + COORDS_IN_CHUNK.y;
+            const x = COORDS_IN_CHUNK.x + COORDS_IN_CHUNK.y * 2;
+            const y = COORDS_IN_CHUNK.x * -1 + COORDS_IN_CHUNK.y * 2;
 
-            console.log(COORDS_IN_CHUNK.x,COORDS_IN_CHUNK.y)
+            // console.log(Math.floor((COORDS_IN_CHUNK.x) / Tile.width), Math.floor(COORDS_IN_CHUNK.y / Tile.height));
+            let currentSprite = this._tiles[Math.floor(y / Tile.width)][Math.floor(x / Tile.width)]
+            currentSprite.scale.x = .98;
+            currentSprite.scale.y = .98;
+            
         })
     }
 
@@ -39,25 +44,22 @@ export class Chunk {
         this._container.removeChildren();
 
         for (let i = 0; i < Constants.chunkSize; i++) {
+            this._tiles.push([]);
+    
             for (let j = 0; j < Constants.chunkSize; j++) {
 
-                let cartesian = new Point(
-                    i * Tile.width,
-                    i * Tile.height
-                )
-
+                // let iso = new Point(
+                //     ((j * Tile.width * .5  + i * Tile.width * -.5) - Tile.width / 2) + this._chunkCenterOffset,
+                //     j * Tile.height * .5 + i * Tile.height * .5
+                // );
                 let iso = new Point(
-                    ((j * Tile.width * .5  + i * Tile.width * -.5) - Tile.width / 2) + this._chunkCenterOffset,
-                    j * Tile.height * .5 + i * Tile.height * .5
+                    (j * Tile.width - Tile.width ) * .5  + i * Tile.height * -.5,
+                    j * Tile.width * .25 + i * Tile.height * .25
                 );
+                    // console.log(this._container.toLocal(iso))
 
-                    console.log(this._container.toLocal(iso))
-
-
-                    // tilePos.x = origin.x + tilePos.x;
-                    // tilePos.y = origin.y + tilePos.y;
-
-                this._container.addChild(Tile.make("/assets/img/tiles/dirt.png", iso));
+                this._tiles[i].push(Tile.make("/assets/img/tiles/dirt_1x1.png", iso));
+                this._container.addChild(this._tiles[i][j]);
             }
         }
 
