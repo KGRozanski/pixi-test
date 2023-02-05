@@ -70,9 +70,7 @@ export class Map {
   private _renderDistance: number = 1;
 
   constructor(private app: Application) {
-    // for (let i = 0; i <= this._renderDistance; i++) {
 
-        // const coords = { x: 0, y: 0 };
 
       this.map.forEach(chunkData => {
         let chunk = new Chunk();
@@ -84,22 +82,15 @@ export class Map {
 
         chunk.container.position = isometricToCartesian(chunkOrigin);
 
-        console.log(chunkOrigin);
         this._chunksBuffer.push(chunk);
       })
 
-
-
-
-      
-    // }
 
 
     this._chunksBuffer.forEach((chunk: Chunk) => {
       
       chunk.render();
       this._container.addChild(chunk.container);
-      // this.renderChunkDiagnostics(metaChunk);
     });
 
     
