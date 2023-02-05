@@ -1,10 +1,11 @@
 import { Application, Container, FederatedPointerEvent, Graphics, Point, Sprite } from "pixi.js";
 import { Constants } from "../constants/Constants.class";
 import { Tile } from "./Tile";
+import { cartesianToIsometric } from "../utils/cartesianToIsometric.function";
+import { isometricToCartesian } from "../utils/isometricToCartesian.function";
 
 export class Chunk {
     private _container: Container;
-    private _chunkCenterOffset = 8 * Tile.width;
     private _tiles: Array<Array<Sprite>> = [];
 
     constructor() {
@@ -14,19 +15,17 @@ export class Chunk {
 
         this._container.on('mousemove', (event: FederatedPointerEvent) => {
             const COORDS_IN_CHUNK = this._container.toLocal(event.client);
-            
-            
 
-            const x = COORDS_IN_CHUNK.x + COORDS_IN_CHUNK.y * 2;
-            const y = COORDS_IN_CHUNK.x * -1 + COORDS_IN_CHUNK.y * 2;
+            const isoCoords = cartesianToIsometric(COORDS_IN_CHUNK);
 
             // console.log(Math.floor((COORDS_IN_CHUNK.x) / Tile.width), Math.floor(COORDS_IN_CHUNK.y / Tile.height));
-            let currentSprite = this._tiles[Math.floor(y / Tile.width)][Math.floor(x / Tile.width)]
-            currentSprite.scale.x = .98;
-            currentSprite.scale.y = .98;
+            let currentSprite = this._tiles[Math.floor(isoCoords.y / Tile.width)][Math.floor(isoCoords.x / Tile.width)]
+            currentSprite.visible = false;
             
         })
     }
+
+
 
     public get container(): Container {
         return this._container;
@@ -40,7 +39,7 @@ export class Chunk {
         return Tile.height * Constants.chunkSize;
     }
 
-    render(origin: Point) {
+    render() {
         this._container.removeChildren();
 
         for (let i = 0; i < Constants.chunkSize; i++) {
@@ -52,11 +51,16 @@ export class Chunk {
                 //     ((j * Tile.width * .5  + i * Tile.width * -.5) - Tile.width / 2) + this._chunkCenterOffset,
                 //     j * Tile.height * .5 + i * Tile.height * .5
                 // );
-                let iso = new Point(
-                    (j * Tile.width - Tile.width ) * .5  + i * Tile.height * -.5,
-                    j * Tile.width * .25 + i * Tile.height * .25
-                );
+                // let _iso = new Point(
+                //     (j * Tile.width - Tile.width ) * .5  + i * Tile.height * -.5,
+                //     j * Tile.width * .25 + i * Tile.height * .25
+                // );
                     // console.log(this._container.toLocal(iso))
+
+                let iso = isometricToCartesian(new Point(
+                    j * Tile.width - Tile.width * .5,
+                    i * Tile.height + Tile.height * .5
+                ))
 
                 this._tiles[i].push(Tile.make("/assets/img/tiles/dirt_1x1.png", iso));
                 this._container.addChild(this._tiles[i][j]);
@@ -64,6 +68,11 @@ export class Chunk {
         }
 
     }
+
+
+
+
+
 
     // render(origin: Point) {
     //     this._container.removeChildren();

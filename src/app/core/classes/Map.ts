@@ -12,39 +12,94 @@ import { keyFactory } from '../functions/keyFactory.function';
 import { getScreenCenter } from '../utils/getScreenCenter.function';
 import { Chunk } from './Chunk';
 import { Tile } from './Tile';
+import { Constants } from '../constants/Constants.class';
+import { cartesianToIsometric } from '../utils/cartesianToIsometric.function';
+import { isometricToCartesian } from '../utils/isometricToCartesian.function';
+
 interface ChunkWithMetadata {
-  coords: { x: number; y: number };
+  coords: Point;
   chunk: Chunk;
 }
 
 export class Map {
   public _container: Container = new Container();
   public origin: Point = getScreenCenter();
-  public chunks: Array<Array<ChunkWithMetadata>> = [];
-  // Size of the rectangle minimum to cover the entire screen
-  // chunks x,y axis  must be at least bigger than the screen size
-  private _gridSize: number = 4;
+  public map: Array<any> = [
+    {
+      coords: [-1,-1],
+      chunk: []
+    },
+    {
+      coords: [0,-1],
+      chunk: []
+    },
+    {
+      coords: [1,-1],
+      chunk: []
+    },
+
+    {
+      coords: [-1,0],
+      chunk: []
+    },
+    {
+      coords: [0,0],
+      chunk: []
+    },
+    {
+      coords: [1,0],
+      chunk: []
+    },
+
+    {
+      coords: [-1,1],
+      chunk: []
+    },
+    {
+      coords: [0,1],
+      chunk: []
+    },
+    {
+      coords: [1,1],
+      chunk: []
+    },
+  ];
+
+  // array of chunks in current render distance to be drawn
+  private _chunksBuffer: Array<Chunk> = [];
+  private _renderDistance: number = 1;
 
   constructor(private app: Application) {
-    const HALF_GRID_SIZE = this._gridSize / 2;
+    // for (let i = 0; i <= this._renderDistance; i++) {
 
-    for (let i = 0; i < this._gridSize; i++) {
-      this.chunks.push([]);
+        // const coords = { x: 0, y: 0 };
 
-      for (let j = 0; j < this._gridSize; j++) {
-        const coords = { x: j - HALF_GRID_SIZE, y: i - HALF_GRID_SIZE };
-        const CHUNK = new Chunk();
-        this.chunks[i].push({
-          coords,
-          chunk: CHUNK,
-        });
-      }
-    }
+      this.map.forEach(chunkData => {
+        let chunk = new Chunk();
 
-    this.chunks.flat().forEach((metaChunk: ChunkWithMetadata) => {
-      metaChunk.chunk.render(this.getChunkPos(metaChunk.coords));
-      this._container.addChild(metaChunk.chunk.container);
-      this.renderChunkDiagnostics(metaChunk);
+        let chunkOrigin = new Point(
+          chunkData.coords[0] * Tile.width * Constants.chunkSize,
+          chunkData.coords[1] * Tile.width * Constants.chunkSize
+        );
+
+        chunk.container.position = isometricToCartesian(chunkOrigin);
+
+        console.log(chunkOrigin);
+        this._chunksBuffer.push(chunk);
+      })
+
+
+
+
+      
+    // }
+
+
+    this._chunksBuffer.forEach((chunk: Chunk) => {
+      
+      chunk.render();
+      this._container.addChild(chunk.container);
+      // this.renderChunkDiagnostics(metaChunk);
     });
 
     
@@ -106,15 +161,9 @@ export class Map {
   }
 
 
-  getChunkPos(coords: { x: number; y: number }): Point {
-    return new Point(
-      (Chunk.width * coords.x - (this.origin.x - getScreenCenter().x)),
-      (Chunk.height * coords.y - (this.origin.y - getScreenCenter().y))
-    );
-  }
 
   renderChunkDiagnostics(metaChunk: ChunkWithMetadata) {
-    const CHUNK_ORIGIN = this.getChunkPos(metaChunk.coords);
+    const CHUNK_ORIGIN: any = null
     const graphics = new Graphics();
     graphics
       .lineStyle(1, 0xff0000)
