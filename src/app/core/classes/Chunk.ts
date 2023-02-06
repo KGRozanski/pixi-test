@@ -10,23 +10,35 @@ export class Chunk {
     private _tiles: Array<Array<Sprite>> = [];
     private _tileOutline = new Graphics();
     public coords: any;
-    private readonly _map: any;
+    private readonly _map: Map;
 
     constructor(public map: Map) {
         this._container = new Container();
         this._container.name = "chunk";
         this._map = map;
-        this._trackMouse();
+        this._registerEventListeners();
     }
 
-    private _trackMouse() {
+    public get container(): Container {
+        return this._container;
+    }
+
+    private _registerEventListeners() {
         this._container.on('mousemove', (event: FederatedPointerEvent) => {
             const COORDS_IN_CHUNK = this._container.toLocal(event.client);
-            this._drawHover(cartesianToIsometric(COORDS_IN_CHUNK));
-        })
+            this._target(cartesianToIsometric(COORDS_IN_CHUNK));
+        });
+
+        this._container.on('click', (event: FederatedPointerEvent) => {
+            this._map.targetedTile.y += 50;
+        });
     }
 
-    private _drawHover(mousePos: Point) {
+    /**
+     * Evaluates coordinates of mouse and sets currently targeted Chunk and Tile
+     * @param mousePos 
+     */
+    private _target(mousePos: Point) {
         this._map.clearGraphics();
         const TRACKS = new Point(
             Math.floor(mousePos.x / Tile.width),
@@ -34,26 +46,43 @@ export class Chunk {
         );
 
         if (TRACKS.x < 0) {
-            const chunk = this._map.getChunk([this.coords[0] - 1, this.coords[1]]);
-            chunk.renderTileDiagnostics(new Point(Constants.chunkSize - 1, TRACKS.y));
+            this._map.targetedChunk = this._map.getChunk([this.coords[0] - 1, this.coords[1]]) as Chunk;
+            this._map.targetedTile = this._map.targetedChunk?._tiles[TRACKS.y][Constants.chunkSize - 1] as Sprite;
         }
 
         if (TRACKS.y < 0) {
-            const chunk = this._map.getChunk([this.coords[0], this.coords[1] - 1]);
-            chunk.renderTileDiagnostics(new Point(TRACKS.x, Constants.chunkSize - 1));
+            this._map.targetedChunk = this._map.getChunk([this.coords[0], this.coords[1] - 1]) as Chunk;
+            this._map.targetedTile = this._map.targetedChunk?._tiles[Constants.chunkSize - 1][TRACKS.x] as Sprite;
         }
 
         if (TRACKS.y < 0 && TRACKS.x < 0) {
-            const chunk = this._map.getChunk([this.coords[0] - 1, this.coords[1] - 1]);
-            chunk.renderTileDiagnostics(new Point(Constants.chunkSize - 1, Constants.chunkSize - 1));
+            this._map.targetedChunk = this._map.getChunk([this.coords[0] - 1, this.coords[1] - 1]) as Chunk;
+            this._map.targetedTile = this._map.targetedChunk?._tiles[Constants.chunkSize - 1][Constants.chunkSize - 1] as Sprite;
         }
 
         if (TRACKS.y >= 0 && TRACKS.x >= 0) {
-            this.renderTileDiagnostics(TRACKS)
+            this._map.targetedChunk = this;
+            this._map.targetedTile = this._map.targetedChunk?._tiles[TRACKS.y][TRACKS.x];
         }
+
+        this._map.targetedChunk.renderTileDiagnostics();
     }
 
+    public renderTileDiagnostics() {
+        let origin = new Point(this._map.targetedTile.x, this._map.targetedTile.y);
+        origin.x += Tile.width * .5;
 
+        this._tileOutline.lineStyle(1, 0xffffff, 1);
+        this._tileOutline.beginFill(0xffffff, .1);
+        this._tileOutline.drawPolygon(
+            origin,
+            new Point(origin.x + Tile.width * .5, origin.y + Tile.width * .25),
+            new Point(origin.x, origin.y + Tile.width * .5),
+            new Point(origin.x - Tile.width * .5, origin.y + Tile.width * .25),
+        );
+        this._tileOutline.endFill();
+        
+    }
 
     public renderChunkDiagnostics() {
         const outline = new Graphics();
@@ -72,36 +101,6 @@ export class Chunk {
 
 
         this._container.addChild(description);
-    }
-
-    public renderTileDiagnostics(tileOrigin: Point) {
-        const tileToDrawOn = this._tiles[tileOrigin.y][tileOrigin.x];
-
-        let origin = new Point(tileToDrawOn.position.x, tileToDrawOn.position.y);
-        origin.x += Tile.width * .5;
-
-        this._tileOutline.lineStyle(1, 0xff0000, 1);
-        this._tileOutline.beginFill(0xff0000, .2);
-        this._tileOutline.drawPolygon(
-            origin,
-            new Point(origin.x + Tile.width * .5, origin.y + Tile.width * .25),
-            new Point(origin.x, origin.y + Tile.width * .5),
-            new Point(origin.x - Tile.width * .5, origin.y + Tile.width * .25),
-        );
-        this._tileOutline.endFill();
-        
-    }
-
-    public get container(): Container {
-        return this._container;
-    }
-
-    public static get width(): number {
-        return Tile.width * Constants.chunkSize;
-    }
-
-    public static get height(): number {
-        return Tile.height * Constants.chunkSize;
     }
 
     render() {
@@ -125,31 +124,8 @@ export class Chunk {
         this._container.addChild(this._tileOutline);
     }
 
-
-
     public clearGraphics(): void {
         this._tileOutline.clear();
     }
-
-
-    // render(origin: Point) {
-    //     this._container.removeChildren();
-
-    //     for (let i = 0; i < Constants.chunkSize; i++) {
-    //         for (let j = 0; j < Constants.chunkSize; j++) {
-    //             let tilePos = new Point(
-    //                 (i % 2 !== 0) ? j * Tile.width + Tile.width / 2 : j * Tile.width, 
-    //                 (Tile.height / 2) * i
-    //             );
-
-    //                 tilePos.x = origin.x + tilePos.x;
-    //                 tilePos.y = origin.y + tilePos.y;
-
-    //             this._container.addChild(Tile.make("/assets/img/tiles/dirt.png", tilePos));
-    //         }
-    //     }
-
-    // }
-
 
 }

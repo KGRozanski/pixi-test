@@ -6,7 +6,8 @@ import {
   Rectangle,
   Ticker,
   Text,
-  FederatedPointerEvent
+  FederatedPointerEvent,
+  Sprite
 } from 'pixi.js';
 import { keyFactory } from '../functions/keyFactory.function';
 import { getScreenCenter } from '../utils/getScreenCenter.function';
@@ -68,6 +69,8 @@ export class Map {
   // array of chunks in current render distance to be drawn
   private _chunksBuffer: Array<Chunk> = [];
   private _renderDistance: number = 1;
+  public targetedTile: Sprite = null as unknown as Sprite;
+  public targetedChunk: Chunk = null as unknown as Chunk;
 
   constructor(private app: Application) {
 
