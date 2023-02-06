@@ -1,39 +1,59 @@
-import { Application, Container, FederatedPointerEvent, Graphics, Point, Polygon, Sprite } from "pixi.js";
+import { Application, Container, FederatedPointerEvent, Graphics, Point, Polygon, Sprite, Text } from "pixi.js";
 import { Constants } from "../constants/Constants.class";
 import { Tile } from "./Tile";
 import { cartesianToIsometric } from "../utils/cartesianToIsometric.function";
 import { isometricToCartesian } from "../utils/isometricToCartesian.function";
+import { Map } from "./Map";
 
 export class Chunk {
     private _container: Container;
     private _tiles: Array<Array<Sprite>> = [];
     private _tileOutline = new Graphics();
+    public coords: any;
+    private readonly _map: any;
 
-    constructor() {
+    constructor(public map: Map) {
         this._container = new Container();
-        this._container.name = "chunk"
+        this._container.name = "chunk";
+        this._map = map;
+        this._trackMouse();
+    }
 
+    private _trackMouse() {
         this._container.on('mousemove', (event: FederatedPointerEvent) => {
             const COORDS_IN_CHUNK = this._container.toLocal(event.client);
-            const isoCoords = cartesianToIsometric(COORDS_IN_CHUNK);
-            const CURRENT_TILE_IDX_COORDS = this._getCurrentTile(new Point(isoCoords.x, isoCoords.y));
-            const CUR_TILE = this._tiles[CURRENT_TILE_IDX_COORDS.x][CURRENT_TILE_IDX_COORDS.y]
-
-            this.renderTileDiagnostics(CUR_TILE.position);
-
-        })
-
-        this._container.on('mouseout', (event: FederatedPointerEvent) => {
-            this._tileOutline.clear()
+            this._drawHover(cartesianToIsometric(COORDS_IN_CHUNK));
         })
     }
 
-    private _getCurrentTile(mousePos: Point) {
-        return new Point(
-            (Math.floor(Math.abs(mousePos.y) / Tile.width)),
-            (Math.floor(Math.abs(mousePos.x) / Tile.width))
+    private _drawHover(mousePos: Point) {
+        this._map.clearGraphics();
+        const TRACKS = new Point(
+            Math.floor(mousePos.x / Tile.width),
+            Math.floor(mousePos.y / Tile.width),
         );
+
+        if (TRACKS.x < 0) {
+            const chunk = this._map.getChunk([this.coords[0] - 1, this.coords[1]]);
+            chunk.renderTileDiagnostics(new Point(Constants.chunkSize - 1, TRACKS.y));
+        }
+
+        if (TRACKS.y < 0) {
+            const chunk = this._map.getChunk([this.coords[0], this.coords[1] - 1]);
+            chunk.renderTileDiagnostics(new Point(TRACKS.x, Constants.chunkSize - 1));
+        }
+
+        if (TRACKS.y < 0 && TRACKS.x < 0) {
+            const chunk = this._map.getChunk([this.coords[0] - 1, this.coords[1] - 1]);
+            chunk.renderTileDiagnostics(new Point(Constants.chunkSize - 1, Constants.chunkSize - 1));
+        }
+
+        if (TRACKS.y >= 0 && TRACKS.x >= 0) {
+            this.renderTileDiagnostics(TRACKS)
+        }
     }
+
+
 
     public renderChunkDiagnostics() {
         const outline = new Graphics();
@@ -46,13 +66,20 @@ export class Chunk {
         );
         outline.endFill();
         this._container.addChild(outline);
+
+        const description = new Text(`${this.coords[0]}, ${this.coords[1]}`, {fill: '#ff0000'});
+                description.position = new Point(0,0)
+
+
+        this._container.addChild(description);
     }
 
     public renderTileDiagnostics(tileOrigin: Point) {
-        let origin = new Point(tileOrigin.x, tileOrigin.y);
+        const tileToDrawOn = this._tiles[tileOrigin.y][tileOrigin.x];
+
+        let origin = new Point(tileToDrawOn.position.x, tileToDrawOn.position.y);
         origin.x += Tile.width * .5;
 
-        this._tileOutline.clear();
         this._tileOutline.lineStyle(1, 0xff0000, 1);
         this._tileOutline.beginFill(0xff0000, .2);
         this._tileOutline.drawPolygon(
@@ -100,7 +127,9 @@ export class Chunk {
 
 
 
-
+    public clearGraphics(): void {
+        this._tileOutline.clear();
+    }
 
 
     // render(origin: Point) {
