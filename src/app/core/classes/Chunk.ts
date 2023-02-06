@@ -7,15 +7,11 @@ import { isometricToCartesian } from "../utils/isometricToCartesian.function";
 export class Chunk {
     private _container: Container;
     private _tiles: Array<Array<Sprite>> = [];
-
+    private _tileOutline = new Graphics();
 
     constructor() {
         this._container = new Container();
         this._container.name = "chunk"
-
-
-
-
 
         this._container.on('mousemove', (event: FederatedPointerEvent) => {
             const COORDS_IN_CHUNK = this._container.toLocal(event.client);
@@ -25,6 +21,10 @@ export class Chunk {
 
             this.renderTileDiagnostics(CUR_TILE.position);
 
+        })
+
+        this._container.on('mouseout', (event: FederatedPointerEvent) => {
+            this._tileOutline.clear()
         })
     }
 
@@ -51,17 +51,18 @@ export class Chunk {
     public renderTileDiagnostics(tileOrigin: Point) {
         let origin = new Point(tileOrigin.x, tileOrigin.y);
         origin.x += Tile.width * .5;
-        console.log(origin)
-        const outline = new Graphics();
-        outline.lineStyle(1, 0xff0000, 1);
-        outline.drawPolygon(
+
+        this._tileOutline.clear();
+        this._tileOutline.lineStyle(1, 0xff0000, 1);
+        this._tileOutline.beginFill(0xff0000, .2);
+        this._tileOutline.drawPolygon(
             origin,
             new Point(origin.x + Tile.width * .5, origin.y + Tile.width * .25),
             new Point(origin.x, origin.y + Tile.width * .5),
             new Point(origin.x - Tile.width * .5, origin.y + Tile.width * .25),
         );
-        outline.endFill();
-        this._container.addChild(outline);
+        this._tileOutline.endFill();
+        
     }
 
     public get container(): Container {
@@ -94,7 +95,7 @@ export class Chunk {
         }
 
         this.renderChunkDiagnostics();
-
+        this._container.addChild(this._tileOutline);
     }
 
 
