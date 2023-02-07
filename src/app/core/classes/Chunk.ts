@@ -41,8 +41,8 @@ export class Chunk {
     private _target(mousePos: Point) {
         this._map.clearGraphics();
         const TRACKS = new Point(
-            Math.floor(mousePos.x / Tile.width),
-            Math.floor(mousePos.y / Tile.width),
+            Math.floor(mousePos.x / Constants.tileSize),
+            Math.floor(mousePos.y / Constants.tileSize),
         );
 
         if (TRACKS.x < 0) {
@@ -70,15 +70,15 @@ export class Chunk {
 
     public renderTileDiagnostics() {
         let origin = new Point(this._map.targetedTile.x, this._map.targetedTile.y);
-        origin.x += Tile.width * .5;
+        origin.x += Constants.tileSize * .5;
 
         this._tileOutline.lineStyle(1, 0xffffff, 1);
         this._tileOutline.beginFill(0xffffff, .1);
         this._tileOutline.drawPolygon(
             origin,
-            new Point(origin.x + Tile.width * .5, origin.y + Tile.width * .25),
-            new Point(origin.x, origin.y + Tile.width * .5),
-            new Point(origin.x - Tile.width * .5, origin.y + Tile.width * .25),
+            new Point(origin.x + Constants.tileSize * .5, origin.y + Constants.tileSize * .25),
+            new Point(origin.x, origin.y + Constants.tileSize * .5),
+            new Point(origin.x - Constants.tileSize * .5, origin.y + Constants.tileSize * .25),
         );
         this._tileOutline.endFill();
         
@@ -89,9 +89,9 @@ export class Chunk {
         outline.lineStyle(1, 0xffd900, 1);
         outline.drawPolygon(
             new Point(0, 0),
-            isometricToCartesian(new Point(Constants.chunkSize * Tile.width, 0)),
-            isometricToCartesian(new Point(Constants.chunkSize * Tile.width, Constants.chunkSize * Tile.width)),
-            isometricToCartesian(new Point(0, Constants.chunkSize * Tile.width))
+            isometricToCartesian(new Point(Constants.chunkSize * Constants.tileSize, 0)),
+            isometricToCartesian(new Point(Constants.chunkSize * Constants.tileSize, Constants.chunkSize * Constants.tileSize)),
+            isometricToCartesian(new Point(0, Constants.chunkSize * Constants.tileSize))
         );
         outline.endFill();
         this._container.addChild(outline);
@@ -111,12 +111,13 @@ export class Chunk {
     
             for (let j = 0; j < Constants.chunkSize; j++) {
                 let iso = isometricToCartesian(new Point(
-                    j * Tile.width - Tile.width * .5,
-                    i * Tile.height + Tile.height * .5
+                    j * Constants.tileSize - Constants.tileSize * .5,
+                    i * Constants.tileSize + Constants.tileSize * .5
                 ))
-
-                this._tiles[i].push(Tile.make("/assets/img/tiles/dirt_256px.png", iso));
+                const TILE = new Tile(iso);
+                this._tiles[i].push(TILE.getSprite("/assets/img/tiles/dirt_256px.png"));
                 this._container.addChild(this._tiles[i][j]);
+                this._container.addChild(TILE.debugText(`${j},${i}`));
             }
         }
 

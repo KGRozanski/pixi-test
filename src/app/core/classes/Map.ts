@@ -80,8 +80,8 @@ export class Map {
           chunk.coords = chunkData.coords;
 
         let chunkOrigin = new Point(
-          chunkData.coords[0] * Tile.width * Constants.chunkSize,
-          chunkData.coords[1] * Tile.width * Constants.chunkSize
+          chunkData.coords[0] * Constants.tileSize * Constants.chunkSize,
+          chunkData.coords[1] * Constants.tileSize * Constants.chunkSize
         );
 
         chunk.container.position = isometricToCartesian(chunkOrigin);

@@ -1,57 +1,32 @@
-import { Graphics, Point, Sprite } from 'pixi.js';
+import { Point, Sprite, Text } from 'pixi.js';
 import { Constants } from '../constants/Constants.class';
 
 export class Tile {
-  constructor() {}
+  private readonly _position: Point;
 
-  public static get width(): number {
-    return Constants.tileSize;
+
+  constructor(pos: Point) {
+    this._position = pos;
   }
 
-  public static get height(): number {
-    // return Math.floor(Tile.width / Math.tan((60 * Math.PI) / 180));
-    return Constants.tileSize;
-  }
-
-  public static make(texture: string, pos: Point) {
+  public getSprite(texture: string ): Sprite {
     const SPRITE: Sprite = Sprite.from(texture);
-    SPRITE.x = pos.x;
-    SPRITE.y = pos.y;
+          SPRITE.x = this._position.x;
+          SPRITE.y = this._position.y;
 
     SPRITE.interactive = true;
-    // SPRITE.on('mouseover', (event: any) => {
-    //   Tile.renderHover(SPRITE);
-    // });
-
-    // SPRITE.on('mouseout', (event: any) => {
-    //   SPRITE.parent.removeChild(SPRITE.parent.getChildByName('hover_outline'))
-    // });
 
     return SPRITE;
   }
 
-  public static renderHover(sprite: Sprite) {
-    const graphics = new Graphics();
-    graphics.name = 'hover_outline';
-    graphics
-      .lineStyle(1, 0xff0000)
-      .drawRect(
-        sprite.x ,
-        sprite.y,
-        Tile.width,
-        Tile.height
-      );
-    sprite.parent.addChild(graphics);
+  public debugText(coordsSpan: string): Text {
+    const DEBUG_TEXT = new Text(coordsSpan, {fill: '#eee'});
+          DEBUG_TEXT.position = new Point(
+            (this._position.x + Constants.tileSize * .5) - 20,
+            (this._position.y + Constants.tileSize * .25) - 20
+          );
+
+    return DEBUG_TEXT;
+    
   }
-
-  // public draw(posX: number, posY: number) {
-  //     // draw polygon
-  //     const path = [0, 0, 700, 460, 780, 420, 730, 570, 590, 520];
-
-  //     this.graphics.lineStyle(0);
-  //     this.graphics.beginFill(0x9e528e, 1);
-  //     this.graphics.drawPolygon(path);
-  //     this.graphics.endFill();
-
-  // }
 }
