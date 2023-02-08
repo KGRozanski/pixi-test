@@ -1,21 +1,14 @@
 import {
   Application,
   Container,
-  Graphics,
   Point,
-  Rectangle,
-  Ticker,
-  Text,
-  FederatedPointerEvent,
   Sprite
 } from 'pixi.js';
 import { keyFactory } from '../functions/keyFactory.function';
 import { getScreenCenter } from '../utils/getScreenCenter.function';
 import { Chunk } from './Chunk';
-import { Tile } from './Tile';
 import { Constants } from '../constants/Constants.class';
-import { cartesianToIsometric } from '../utils/cartesianToIsometric.function';
-import { isometricToCartesian } from '../utils/isometricToCartesian.function';
+import { carToIso } from '../utils/carToIso.function';
 
 interface ChunkWithMetadata {
   coords: Point;
@@ -84,7 +77,7 @@ export class Map {
           chunkData.coords[1] * Constants.tileSize * Constants.chunkSize
         );
 
-        chunk.container.position = isometricToCartesian(chunkOrigin);
+        chunk.container.position = carToIso(chunkOrigin);
 
         this._chunksBuffer.push(chunk);
       })

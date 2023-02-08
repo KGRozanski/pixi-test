@@ -1,8 +1,8 @@
-import { Application, Container, FederatedPointerEvent, Graphics, Point, Polygon, Sprite, Text } from "pixi.js";
+import { Container, FederatedPointerEvent, Graphics, Point, Sprite, Text } from "pixi.js";
 import { Constants } from "../constants/Constants.class";
 import { Tile } from "./Tile";
-import { cartesianToIsometric } from "../utils/cartesianToIsometric.function";
-import { isometricToCartesian } from "../utils/isometricToCartesian.function";
+import { isoToCar } from "../utils/isoToCar.function";
+import { carToIso } from "../utils/carToIso.function";
 import { Map } from "./Map";
 
 export class Chunk {
@@ -26,7 +26,7 @@ export class Chunk {
     private _registerEventListeners() {
         this._container.on('mousemove', (event: FederatedPointerEvent) => {
             const COORDS_IN_CHUNK = this._container.toLocal(event.client);
-            this._target(cartesianToIsometric(COORDS_IN_CHUNK));
+            this._target(isoToCar(COORDS_IN_CHUNK));
         });
 
         this._container.on('click', (event: FederatedPointerEvent) => {
@@ -89,9 +89,9 @@ export class Chunk {
         outline.lineStyle(1, 0xffd900, 1);
         outline.drawPolygon(
             new Point(0, 0),
-            isometricToCartesian(new Point(Constants.chunkSize * Constants.tileSize, 0)),
-            isometricToCartesian(new Point(Constants.chunkSize * Constants.tileSize, Constants.chunkSize * Constants.tileSize)),
-            isometricToCartesian(new Point(0, Constants.chunkSize * Constants.tileSize))
+            carToIso(new Point(Constants.chunkSize * Constants.tileSize, 0)),
+            carToIso(new Point(Constants.chunkSize * Constants.tileSize, Constants.chunkSize * Constants.tileSize)),
+            carToIso(new Point(0, Constants.chunkSize * Constants.tileSize))
         );
         outline.endFill();
         this._container.addChild(outline);
@@ -110,11 +110,11 @@ export class Chunk {
             this._tiles.push([]);
     
             for (let j = 0; j < Constants.chunkSize; j++) {
-                let iso = isometricToCartesian(new Point(
+                const TILE_POS = carToIso(new Point(
                     j * Constants.tileSize - Constants.tileSize * .5,
                     i * Constants.tileSize + Constants.tileSize * .5
                 ))
-                const TILE = new Tile(iso);
+                const TILE = new Tile(TILE_POS);
                 this._tiles[i].push(TILE.getSprite("/assets/img/tiles/dirt_256px.png"));
                 this._container.addChild(this._tiles[i][j]);
                 this._container.addChild(TILE.debugText(`${j},${i}`));
