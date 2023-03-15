@@ -24,14 +24,10 @@ export class Chunk {
     }
 
     private _registerEventListeners() {
-        this._container.on('mousemove', (event: FederatedPointerEvent) => {
+        this._container.onmousemove = (event) => {
             const COORDS_IN_CHUNK = this._container.toLocal(event.client);
             this._target(isoToCar(COORDS_IN_CHUNK));
-        });
-
-        this._container.on('click', (event: FederatedPointerEvent) => {
-            this._map.targetedTile.y += 50;
-        });
+        }
     }
 
     /**
@@ -117,7 +113,7 @@ export class Chunk {
                 const TILE = new Tile(TILE_POS);
                 this._tiles[i].push(TILE.getSprite("/assets/img/tiles/dirt_256px.png"));
                 this._container.addChild(this._tiles[i][j]);
-                this._container.addChild(TILE.debugText(`${j},${i}`));
+                // this._container.addChild(TILE.debugText(`${j},${i}`));
             }
         }
 

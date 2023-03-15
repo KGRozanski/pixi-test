@@ -14,7 +14,7 @@ export class Tile {
           SPRITE.x = this._position.x;
           SPRITE.y = this._position.y;
 
-    SPRITE.interactive = true;
+    SPRITE.eventMode = 'static';
 
     return SPRITE;
   }

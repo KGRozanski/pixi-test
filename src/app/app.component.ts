@@ -1,8 +1,13 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, Inject } from '@angular/core';
+
 import * as PIXI from 'pixi.js';
-import { Point } from 'pixi.js';
 import { Map } from './core/classes/Map';
+import { Toolbar } from './core/classes/Toolbar';
+
+import '@pixi/math-extras';
+import '@pixi/events';
+import { Application, IApplicationOptions } from 'pixi.js';
 
 @Component({
   selector: 'app-root',
@@ -14,8 +19,7 @@ export class AppComponent {
   // The application will create a renderer using WebGL, if possible,
   // with a fallback to a canvas render. It will also setup the ticker
   // and the root stage PIXI.Container
-  private Application: any;
-  
+  private Application: Application;
 
   
   
@@ -28,18 +32,10 @@ export class AppComponent {
       sharedTicker: true
     });
 
-    document.body.appendChild(this.Application.view);
+    document.body.appendChild(this.Application.view as any);
     const map = new Map(this.Application);
+    const toolbar = new Toolbar(this.Application);
     this.Application.stage.addChild(map.container)
+    this.Application.stage.addChild(toolbar.container)
   }
-
-  async ngOnInit() {
-
-
-
-
-    // this.Application.stage.addChild(this.graphics);
-  }
-
-
 }

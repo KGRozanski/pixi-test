@@ -10,13 +10,9 @@ import { Chunk } from './Chunk';
 import { Constants } from '../constants/Constants.class';
 import { carToIso } from '../utils/carToIso.function';
 
-interface ChunkWithMetadata {
-  coords: Point;
-  chunk: Chunk;
-}
 
 export class Map {
-  public _container: Container = new Container();
+  private _container: Container = new Container();
   public origin: Point = getScreenCenter();
   public map: Array<any> = [
     {
