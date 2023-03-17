@@ -1,59 +1,23 @@
 import {
   Application,
   Container,
+  Graphics,
   Point,
   Sprite
 } from 'pixi.js';
 import { keyFactory } from '../functions/keyFactory.function';
 import { getScreenCenter } from '../utils/getScreenCenter.function';
 import { Chunk } from './Chunk';
-import { Constants } from '../constants/Constants.class';
-import { carToIso } from '../utils/carToIso.function';
-
+import world from '../data/map.json';
+import { Map as MapType } from '../types/Map.type';
+import { IChunk } from '../interfaces/Chunk.interface';
+import { DataService } from '../services/data.service';
+import { EntityFactory } from './Entity.factory';
 
 export class Map {
   private _container: Container = new Container();
   public origin: Point = getScreenCenter();
-  public map: Array<any> = [
-    {
-      coords: [-1,-1],
-      chunk: []
-    },
-    {
-      coords: [0,-1],
-      chunk: []
-    },
-    {
-      coords: [1,-1],
-      chunk: []
-    },
-
-    {
-      coords: [-1,0],
-      chunk: []
-    },
-    {
-      coords: [0,0],
-      chunk: []
-    },
-    {
-      coords: [1,0],
-      chunk: []
-    },
-
-    {
-      coords: [-1,1],
-      chunk: []
-    },
-    {
-      coords: [0,1],
-      chunk: []
-    },
-    {
-      coords: [1,1],
-      chunk: []
-    },
-  ];
+  public map: MapType = world as MapType;
 
   // array of chunks in current render distance to be drawn
   private _chunksBuffer: Array<Chunk> = [];
@@ -61,33 +25,22 @@ export class Map {
   public targetedTile: Sprite = null as unknown as Sprite;
   public targetedChunk: Chunk = null as unknown as Chunk;
 
-  constructor(private app: Application) {
+  constructor(private app: Application, private dataService: DataService) {
 
-
-      this.map.forEach(chunkData => {
-        let chunk = new Chunk(this);
-          chunk.coords = chunkData.coords;
-
-        let chunkOrigin = new Point(
-          chunkData.coords[0] * Constants.tileSize * Constants.chunkSize,
-          chunkData.coords[1] * Constants.tileSize * Constants.chunkSize
-        );
-
-        chunk.container.position = carToIso(chunkOrigin);
-
-        this._chunksBuffer.push(chunk);
-      })
-
+    this.map.forEach((chunkData: IChunk) => {
+      const CHUNK = new Chunk(this, chunkData);
+      this._chunksBuffer.push(CHUNK);
+    });
 
 
     this._chunksBuffer.forEach((chunk: Chunk) => {
-      
       chunk.render();
       this._container.addChild(chunk.container);
     });
 
 
     this.listen();
+    this.setupListener();
   }
 
   public get container(): Container {
@@ -120,13 +73,35 @@ export class Map {
     });
   }
 
-  public getChunk(coords: Array<number>): Chunk | undefined {
-    return this._chunksBuffer.find((chunk: any) => chunk.coords.toString() === coords.toString());
+  public getChunk(coords: Point): Chunk | undefined {
+    return this._chunksBuffer.find((chunk: any) => chunk.coords.equals(coords));
   }
 
   public clearGraphics(): void {
     this._chunksBuffer.forEach((chunk: any) => chunk.clearGraphics());
   }
 
+  public setupListener(): void {
+    let graphics = new Graphics();
+    graphics.beginFill(0x0000ff);
+    graphics.drawRect(0, 0, 100, 100);
+    
+    this._container.onmousemove = (event) => {
+      if(this.targetedTile) {
+        this.targetedChunk.entitiesContainer.addChild(graphics)
+        graphics.position.set(this.targetedTile.position.x, this.targetedTile.position.y);
+        // console.log(this.targetedChunk.entitiesContainer)
+      }
+    };
+
+    this.dataService.buildEntity$.subscribe((entityName) => {
+      EntityFactory.setStrategy(entityName);
+      let choosenEntity = EntityFactory.entity.getSprite();
+      choosenEntity.position.set(
+        this.targetedTile.position.x, this.targetedTile.position.y
+      );
+      this.targetedChunk.entitiesContainer.addChild(choosenEntity);
+    });
+  }
 
 }

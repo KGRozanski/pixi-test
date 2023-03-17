@@ -1,21 +1,28 @@
-import { Container, FederatedPointerEvent, Graphics, Point, Sprite, Text } from "pixi.js";
+import { Container, Graphics, Point, Sprite, Text } from "pixi.js";
 import { Constants } from "../constants/Constants.class";
 import { Tile } from "./Tile";
 import { isoToCar } from "../utils/isoToCar.function";
 import { carToIso } from "../utils/carToIso.function";
 import { Map } from "./Map";
+import { IChunk } from "../interfaces/Chunk.interface";
 
 export class Chunk {
+    public coords: Point;
+    public origin: Point;
+    public entitiesContainer: Container = new Container();
+
     private _container: Container;
     private _tiles: Array<Array<Sprite>> = [];
     private _tileOutline = new Graphics();
-    public coords: any;
     private readonly _map: Map;
 
-    constructor(public map: Map) {
+    constructor(public map: Map, public chunkData: IChunk) {
+        this._map = map;
         this._container = new Container();
         this._container.name = "chunk";
-        this._map = map;
+        this.coords = new Point(chunkData.coords[0], chunkData.coords[1]);
+        this.origin = this.coords.multiplyScalar(Constants.tileSize * Constants.chunkSize)
+        this._container.position = carToIso(this.origin);
         this._registerEventListeners();
     }
 
@@ -42,17 +49,17 @@ export class Chunk {
         );
 
         if (TRACKS.x < 0) {
-            this._map.targetedChunk = this._map.getChunk([this.coords[0] - 1, this.coords[1]]) as Chunk;
+            this._map.targetedChunk = this._map.getChunk(new Point(this.coords.x - 1, this.coords.y)) as Chunk;
             this._map.targetedTile = this._map.targetedChunk?._tiles[TRACKS.y][Constants.chunkSize - 1] as Sprite;
         }
 
         if (TRACKS.y < 0) {
-            this._map.targetedChunk = this._map.getChunk([this.coords[0], this.coords[1] - 1]) as Chunk;
+            this._map.targetedChunk = this._map.getChunk(new Point(this.coords.x, this.coords.y - 1)) as Chunk;
             this._map.targetedTile = this._map.targetedChunk?._tiles[Constants.chunkSize - 1][TRACKS.x] as Sprite;
         }
 
         if (TRACKS.y < 0 && TRACKS.x < 0) {
-            this._map.targetedChunk = this._map.getChunk([this.coords[0] - 1, this.coords[1] - 1]) as Chunk;
+            this._map.targetedChunk = this._map.getChunk(new Point(this.coords.x - 1, this.coords.y - 1)) as Chunk;
             this._map.targetedTile = this._map.targetedChunk?._tiles[Constants.chunkSize - 1][Constants.chunkSize - 1] as Sprite;
         }
 
@@ -92,7 +99,7 @@ export class Chunk {
         outline.endFill();
         this._container.addChild(outline);
 
-        const description = new Text(`${this.coords[0]}, ${this.coords[1]}`, {fill: '#ff0000'});
+        const description = new Text(`${this.coords.x}, ${this.coords.y}`, {fill: '#ff0000'});
                 description.position = new Point(0,0)
 
 
@@ -118,7 +125,7 @@ export class Chunk {
         }
 
         this.renderChunkDiagnostics();
-        this._container.addChild(this._tileOutline);
+        this._container.addChild(this._tileOutline, this.entitiesContainer);
     }
 
     public clearGraphics(): void {

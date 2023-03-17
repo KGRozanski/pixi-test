@@ -1,0 +1,62 @@
+[
+  {
+    "id": 0,
+    "title": "Tavern"
+  },
+  {
+    "id": 1,
+    "title": "Thatched"
+  },
+  {
+    "id": 2,
+    "title": "House"
+  },
+  {
+    "id": 3,
+    "title": "Fruit"
+  },
+  {
+    "id": 4,
+    "title": "Fish"
+  },
+  {
+    "id": 5,
+    "title": "Tailor"
+  },
+  {
+    "id": 6,
+    "title": "Inn"
+  },
+  {
+    "id": 7,
+    "title": "Oaktree"
+  },
+  {
+    "id": 8,
+    "title": "Treehouse"
+  },
+  {
+    "id": 9,
+    "title": "Clock"
+  },
+  {
+    "id": 10,
+    "title": "Chapel"
+  },
+  {
+    "id": 11,
+    "title": "Crops"
+  },
+  {
+    "id": 12,
+    "title": "Pinetree"
+  },
+  {
+    "id": 13,
+    "title": "Firtree"
+  },
+  {
+    "id": 14,
+    "title": "Marblepath"
+  }
+]

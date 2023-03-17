@@ -8,6 +8,7 @@ import { Toolbar } from './core/classes/Toolbar';
 import '@pixi/math-extras';
 import '@pixi/events';
 import { Application, IApplicationOptions } from 'pixi.js';
+import { DataService } from './core/services/data.service';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +24,7 @@ export class AppComponent {
 
   
   
-  constructor(@Inject(DOCUMENT) private document: Document) {
+  constructor(@Inject(DOCUMENT) private document: Document, private dataServce: DataService) {
     this.Application = new PIXI.Application({
       resizeTo: window,
       resolution: window.devicePixelRatio || 1,
@@ -33,9 +34,7 @@ export class AppComponent {
     });
 
     document.body.appendChild(this.Application.view as any);
-    const map = new Map(this.Application);
-    const toolbar = new Toolbar(this.Application);
+    const map = new Map(this.Application, this.dataServce);
     this.Application.stage.addChild(map.container)
-    this.Application.stage.addChild(toolbar.container)
   }
 }

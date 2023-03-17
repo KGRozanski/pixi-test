@@ -31,7 +31,10 @@ export class Toolbar {
     const tavern = Sprite.from("assets/img/others/tavern.png");
 
     this.app.stage.onmousemove = (event) => {
-    //   tavern.position.set(this.app.map.targetedTile.position.x, this.app.map.targetedTile.position.y);
+      // if(this.global.targetedTile) {
+      //   tavern.position.set(this.global.targetedTile.position.x, this.global.targetedTile.position.y);
+      //   // console.log(this.global.targetedTile.position)
+      // }
     };
     // window.document.onmousemove = (event) => {
     //     console.log(event)
