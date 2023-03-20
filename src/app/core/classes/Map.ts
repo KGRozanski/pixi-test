@@ -82,25 +82,25 @@ export class Map {
   }
 
   public setupListener(): void {
-    let graphics = new Graphics();
-    graphics.beginFill(0x0000ff);
-    graphics.drawRect(0, 0, 100, 100);
+
     
-    this._container.onmousemove = (event) => {
-      if(this.targetedTile) {
-        this.targetedChunk.entitiesContainer.addChild(graphics)
-        graphics.position.set(this.targetedTile.position.x, this.targetedTile.position.y);
-        // console.log(this.targetedChunk.entitiesContainer)
-      }
-    };
+
 
     this.dataService.buildEntity$.subscribe((entityName) => {
       EntityFactory.setStrategy(entityName);
       let choosenEntity = EntityFactory.entity.getSprite();
-      choosenEntity.position.set(
-        this.targetedTile.position.x, this.targetedTile.position.y
-      );
+      console.log(choosenEntity)
+      
+      this._container.onmousemove = (event) => {
+        if(this.targetedTile) {
+          choosenEntity.position.set(
+            this.targetedTile.position.x, this.targetedTile.position.y
+          );
+
+        }
+      };
       this.targetedChunk.entitiesContainer.addChild(choosenEntity);
+
     });
   }
 
