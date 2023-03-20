@@ -2,6 +2,7 @@ import {
   Application,
   Container,
   Graphics,
+  Matrix,
   Point,
   Sprite
 } from 'pixi.js';
@@ -13,6 +14,7 @@ import { Map as MapType } from '../types/Map.type';
 import { IChunk } from '../interfaces/Chunk.interface';
 import { DataService } from '../services/data.service';
 import { EntityFactory } from './Entity.factory';
+import { Constants } from '../constants/Constants.class';
 
 export class Map {
   private _container: Container = new Container();
@@ -28,7 +30,7 @@ export class Map {
   constructor(private app: Application, private dataService: DataService) {
 
     this.map.forEach((chunkData: IChunk) => {
-      const CHUNK = new Chunk(this, chunkData);
+      const CHUNK = new Chunk(this, chunkData, this.dataService);
       this._chunksBuffer.push(CHUNK);
     });
 
@@ -89,17 +91,31 @@ export class Map {
     this.dataService.buildEntity$.subscribe((entityName) => {
       EntityFactory.setStrategy(entityName);
       let choosenEntity = EntityFactory.entity.getSprite();
-      console.log(choosenEntity)
       
       this._container.onmousemove = (event) => {
         if(this.targetedTile) {
           choosenEntity.position.set(
-            this.targetedTile.position.x, this.targetedTile.position.y
+            this.targetedTile.position.x + (Constants.tileSize - choosenEntity.width) / 2, this.targetedTile.position.y - (choosenEntity.height - 100)
           );
 
+          this.targetedChunk.entitiesContainer.addChild(choosenEntity);
+          // console.log(this.targetedChunk.entitiesContainer)
+          // console.log(this.targetedChunk.tracks)
+          // this.targetedTile.parent.addChild(choosenEntity);
+          if (this.targetedChunk.tracks) {
+            let tempContainer: Container = this.targetedChunk.entitiesContainer.children[this.targetedChunk.tracks!.x + this.targetedChunk.tracks!.y] as Container;
+
+            if (tempContainer) {
+              tempContainer.addChild(choosenEntity)
+            }
+          }
+
+
+          this._container.onclick = (event) => {
+            this._container.onmousemove = null;
+          }
         }
       };
-      this.targetedChunk.entitiesContainer.addChild(choosenEntity);
 
     });
   }
