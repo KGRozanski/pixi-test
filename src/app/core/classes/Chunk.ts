@@ -18,7 +18,8 @@ export class Chunk {
     private _tilesContainer: Container = new Container();
     private _debugContainer: Container = new Container();
     private _tiles: Array<Array<Sprite>> = [];
-    private _tileOutline = new Graphics();
+    private _tileOutlineContainer = new Container();
+    private _tileOutlineGraphics = new Graphics();
     private readonly _map: Map;
 
     constructor(public map: Map, public chunkData: IChunk, private dataService: DataService) {
@@ -27,6 +28,7 @@ export class Chunk {
         this._container.name = "chunk";
         this.coords = new Point(chunkData.coords[0], chunkData.coords[1]);
         this.origin = this.coords.multiplyScalar(Constants.tileSize * Constants.chunkSize);
+        this._tileOutlineContainer.addChild(this._tileOutlineGraphics);
         this._container.position = carToIso(this.origin);
         this._registerEventListeners();
     }
@@ -81,19 +83,27 @@ export class Chunk {
     }
 
     public renderTileDiagnostics() {
-        let origin = new Point(this._map.targetedTile.x, this._map.targetedTile.y);
-        origin.x += Constants.tileSize * .5;
 
-        this._tileOutline.lineStyle(1, 0xffffff, 1);
-        this._tileOutline.beginFill(0xffffff, .05);
-        this._tileOutline.drawPolygon(
+        this._tileOutlineContainer.position = this._map.targetedTile.position.add(new Point(128, 64));
+        this._tileOutlineGraphics.pivot = new Point(128, 64)
+
+        this._tileOutlineContainer.scale.x = .95;
+        this._tileOutlineContainer.scale.y = .95;
+
+        let origin = new Point(0, 0);
+        origin.x += Constants.tileSize * .5;
+        
+        this._tileOutlineGraphics.lineStyle(1, 0xffffff, 1);
+        this._tileOutlineGraphics.beginFill(0xffffff, .05);
+        this._tileOutlineGraphics.drawPolygon(
             origin,
             new Point(origin.x + Constants.tileSize * .5, origin.y + Constants.tileSize * .25),
             new Point(origin.x, origin.y + Constants.tileSize * .5),
             new Point(origin.x - Constants.tileSize * .5, origin.y + Constants.tileSize * .25),
         );
-        this._tileOutline.endFill();
-        
+        this._tileOutlineGraphics.endFill();
+
+
     }
 
     public renderChunkDiagnostics() {
@@ -133,13 +143,13 @@ export class Chunk {
             }
         }
         
-        this._container.addChild(this._tilesContainer, this._tileOutline);
+        this._container.addChild(this._tilesContainer, this._tileOutlineContainer);
         this.renderChunkDiagnostics();
         this.container.addChild(this.entitiesContainer, this._debugContainer);
     }
 
     public clearGraphics(): void {
-        this._tileOutline.clear();
+        this._tileOutlineGraphics.clear();
     }
 
 

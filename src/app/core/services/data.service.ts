@@ -7,7 +7,7 @@ import { EntityClassName } from '../types/Entity.type';
 export class DataService {
     public application$: ReplaySubject<Application> = new ReplaySubject(1);
     public buildEntity$ = new Subject<EntityClassName>();
-    public toggleDebugInfo$ = new BehaviorSubject<boolean>(false);
+    public toggleDebugInfo$ = new BehaviorSubject<boolean>(true);
 
     constructor() { }
     
