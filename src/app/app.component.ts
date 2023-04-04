@@ -2,12 +2,13 @@ import { DOCUMENT } from '@angular/common';
 import { Component, HostListener, Inject } from '@angular/core';
 
 import * as PIXI from 'pixi.js';
-import { Map } from './core/classes/Map';
+import { MapService } from './core/services/map.service';
 
 import '@pixi/math-extras';
 import '@pixi/events';
 import { Application, Container, IApplicationOptions, Point, Text } from 'pixi.js';
 import { DataService } from './core/services/data.service';
+import { IOService } from './core/services/io.service';
 
 @Component({
   selector: 'app-root',
@@ -32,19 +33,25 @@ export class AppComponent {
 
   
   
-  constructor(@Inject(DOCUMENT) private document: Document, private dataService: DataService) {
+  constructor(@Inject(DOCUMENT) private document: Document, private dataService: DataService, private map: MapService, private IOService: IOService) {
     this.Application = new PIXI.Application({
       resizeTo: window,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
       antialias: true
     });
-
-    document.body.appendChild(this.Application.view as any);
-    const map = new Map(this.Application, this.dataService);
-    this.Application.stage.addChild(map.container);
-
     dataService.application$.next(this.Application);
+    this.Application.stage.addChild(this.map.container);
+    document.body.appendChild(this.Application.view as any);
+
+    this.Application.ticker.add((delta: number) => {
+      this.dataService.fpsCount$.next(Number(this.Application.ticker.FPS.toFixed(2)));
+      this.IOService.listen();
+    });
+
+
+
+
 
 
     // const description = new Text(`${this.Application.ticker.FPS}`, {fill: '#ff0000'});

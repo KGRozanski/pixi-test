@@ -9,17 +9,9 @@ const _package = require('package.json');
 })
 export class DebugComponent {
   public debugFlag$ = this.dataService.toggleDebugInfo$;
-  public fps: string | null = null;
+  public fps = this.dataService.fpsCount$;
   public package = _package;
 
-  constructor(private dataService: DataService) {
-    this.dataService.application$.subscribe((application) => {
-      application.ticker.add((delta: number) => {
-        this.fps = application.ticker.FPS.toFixed(2);
-      });
-    });
-
-
-  }
+  constructor(private dataService: DataService) {}
 
 }

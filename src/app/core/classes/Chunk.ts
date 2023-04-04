@@ -3,7 +3,7 @@ import { Constants } from "../constants/Constants.class";
 import { Tile } from "./Tile";
 import { isoToCar } from "../utils/isoToCar.function";
 import { carToIso } from "../utils/carToIso.function";
-import { Map } from "./Map";
+import { MapService } from "../services/map.service";
 import { IChunk } from "../interfaces/Chunk.interface";
 import { Injectable, Optional } from "@angular/core";
 import { DataService } from "../services/data.service";
@@ -20,9 +20,9 @@ export class Chunk {
     private _tiles: Array<Array<Sprite>> = [];
     private _tileOutlineContainer = new Container();
     private _tileOutlineGraphics = new Graphics();
-    private readonly _map: Map;
+    private readonly _map: MapService;
 
-    constructor(public map: Map, public chunkData: IChunk, private dataService: DataService) {
+    constructor(public map: MapService, public chunkData: IChunk, private dataService: DataService) {
         this._map = map;
         this._container = new Container();
         this._container.name = "chunk";
