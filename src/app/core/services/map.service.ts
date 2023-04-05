@@ -9,6 +9,7 @@ import { EntityFactory } from "../classes/Entity.factory";
 import { Constants } from "../constants/Constants.class";
 import { Injectable, Optional } from "@angular/core";
 import { IOService } from "./io.service";
+import { Soldier } from "../classes/Soldier";
 
 @Injectable({ providedIn: "root" })
 export class MapService {
@@ -40,6 +41,10 @@ export class MapService {
     });
   
     this.setupListener();
+
+
+
+
   }
 
   public get container(): Container {

@@ -36,7 +36,7 @@ export class IOService {
             x -= 5;
         }
 
-        this.displacementVector$.next(new Point(x,y));
+            this.displacementVector$.next(new Point(x,y));
     }
     
 
